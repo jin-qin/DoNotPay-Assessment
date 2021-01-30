@@ -1,0 +1,32 @@
+.Home {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 80%;
+
+    margin: 3vmin;
+
+    border-radius: 2vmin;
+}
+
+.Home-title {
+    border-radius: 5px;
+    height: 5vmin;
+    background-color: rgb(44, 114, 219);
+    width: 100%;
+}
+
+.Home-body {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+
+    width: 100%;
+}
+
+.Home-DraggedTaskCard {
+    position: absolute;
+}

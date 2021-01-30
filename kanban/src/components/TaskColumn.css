@@ -1,0 +1,36 @@
+.TaskColumn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 3vmin;
+}
+
+.TaskColumn-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    align-items: center;
+
+    height: 5vmin;
+    width: 100%;
+}
+
+.TaskColumn-status {
+    border-radius: 8px;
+    height: 16px;
+    width: 16px;
+    margin-right: 1vmin;
+}
+
+.TaskColumn-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 20vw;
+
+    background-color: rgb(235, 235, 235);
+    border-radius: 5px;
+    padding: 1vmin;
+}
