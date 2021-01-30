@@ -8,6 +8,7 @@ export default function Home() {
     const [taskID, setTaskID] = useState<number>(0);  // global task ID, self-increased
     const [tasks, setTasks] = useState<TaskData[]>([]);   // all tasks data
     const [changeTasks, setChangeTasks] = useState(0); // counter to notify tasks items being changed
+    const [dragFrom, setDragFrom] = useState<TaskType>(TaskType.Unknown);
 
     return (
       <div className="Home">
@@ -22,6 +23,8 @@ export default function Home() {
                 setChangeTasks={setChangeTasks}
                 taskID={taskID}
                 setTaskID={setTaskID}
+                dragFrom={dragFrom}
+                setDragFrom={setDragFrom}
               />
 
               <TaskColumn 
@@ -32,6 +35,8 @@ export default function Home() {
                 setChangeTasks={setChangeTasks}
                 taskID={taskID}
                 setTaskID={setTaskID}
+                dragFrom={dragFrom}
+                setDragFrom={setDragFrom}
               />
 
               <TaskColumn 
@@ -42,6 +47,8 @@ export default function Home() {
                 setChangeTasks={setChangeTasks}
                 taskID={taskID}
                 setTaskID={setTaskID}
+                dragFrom={dragFrom}
+                setDragFrom={setDragFrom}
               />
           </div>
       </div>

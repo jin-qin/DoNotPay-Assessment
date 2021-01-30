@@ -4,7 +4,6 @@ import ButtonTaskAdd from './ButtonTaskAdd';
 import TaskCard from './TaskCard';
 import { getTaskStatusColor, getTaskStatusTitle, genRandomTitle, genRandomBody } from '../utils/misc';
 import { TaskData, TaskType } from '../common/types';
-import move from 'array-move'
 
 interface TaskColumnProps {
   taskType: TaskType,
@@ -14,14 +13,17 @@ interface TaskColumnProps {
   setChangeTasks: React.Dispatch<React.SetStateAction<number>>,
   taskID: number,
   setTaskID: React.Dispatch<React.SetStateAction<number>>
+  dragFrom: TaskType,
+  setDragFrom: React.Dispatch<React.SetStateAction<TaskType>>
 }
 
 export function TaskColumn(props: TaskColumnProps) {
-  const {taskType, tasks, setTasks, changeTasks, setChangeTasks, taskID, setTaskID} = props;
+  const {taskType, tasks, setTasks, changeTasks, setChangeTasks, taskID, setTaskID, dragFrom, setDragFrom} = props;
   
   const [tasksColumn, setTasksColumn] = useState<TaskData[]>([]);
 
   const [prevDragOverY, setPrevDragOverY] = useState(0);
+  const [swapIndex, setSwapIndex] = useState(-1);
 
   const title = getTaskStatusTitle(taskType);
   const statusColor = getTaskStatusColor(taskType);
@@ -35,11 +37,19 @@ export function TaskColumn(props: TaskColumnProps) {
     
     const id = ev.dataTransfer.getData('text/plain');
     
-    const task_idx = tasks.findIndex(task => task.id === Number(id));
-    if (task_idx === -1) return;
+    const taskIndex = tasks.findIndex(task => task.id === Number(id));
+    if (taskIndex === -1) return;
     
-    tasks[task_idx].taskType = taskType;
+    tasks[taskIndex].taskType = taskType;
 
+    if (swapIndex !== -1) {
+      const tmpTask = tasks[taskIndex];
+      tasks[taskIndex] = tasks[swapIndex];
+      tasks[swapIndex] = tmpTask;
+    }
+
+    setSwapIndex(-1);
+    setDragFrom(TaskType.Unknown);
     setChangeTasks(changeTasks + 1);
   };
 
@@ -47,22 +57,16 @@ export function TaskColumn(props: TaskColumnProps) {
     ev.preventDefault();
     ev.stopPropagation();
     
+    if (dragFrom !== taskType) return;
+
     const targetDOM = (ev.target as HTMLDivElement);
     if (targetDOM.className !== 'TaskCard') return;
     if (prevDragOverY === ev.clientY) return;
 
     const taskID = Number(targetDOM.getAttribute("id"));
-    const targetRect = targetDOM.getClientRects()[0];
-    const targetHeight = targetRect.bottom - targetRect.top;
-    const diff = ev.clientY - targetRect.top;
-
-    const task_idx = tasks.findIndex(task => task.id === taskID);
-    if (diff < targetHeight / 2) {
-      
-    } else {
-
-    }
-
+    const taskIdx = tasks.findIndex(task => task.id === taskID);
+    
+    setSwapIndex(taskIdx);
     setPrevDragOverY(ev.clientY);
   };
 
@@ -93,6 +97,7 @@ export function TaskColumn(props: TaskColumnProps) {
               return <TaskCard 
                 key={task.id}
                 taskData={task}
+                setDragFrom={setDragFrom}
                 />;
             })
           }

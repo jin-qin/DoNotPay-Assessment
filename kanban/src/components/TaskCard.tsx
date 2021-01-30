@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import './TaskCard.css';
-import { TaskData } from '../common/types';
+import { TaskData, TaskType } from '../common/types';
 import { getTaskStatusColor } from '../utils/misc';
 
 interface TaskCardProps {
-    taskData: TaskData
+    taskData: TaskData,
+    setDragFrom: React.Dispatch<React.SetStateAction<TaskType>>
 }
 
 function TaskCard(props: TaskCardProps) {
-    const { taskData } = props;
+    const { taskData, setDragFrom } = props;
     const id = taskData.id
     const taskType = taskData.taskType;
     
     const dragStartHandler = (ev: React.DragEvent<HTMLDivElement>, id: number) => {
+        setDragFrom(taskData.taskType);
+
         ev.dataTransfer.setData('text/plain', String(id));
     };
 
     const dragEndHandler = (ev: React.DragEvent<HTMLDivElement>, id: number) => {
-        console.log('END')
+        setDragFrom(TaskType.Unknown);
     };
 
     const statusColor = getTaskStatusColor(taskType);
