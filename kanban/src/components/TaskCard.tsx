@@ -17,6 +17,7 @@ function TaskCard(props: TaskCardProps) {
     };
 
     const dragEndHandler = (ev: React.DragEvent<HTMLDivElement>, id: number) => {
+        console.log('END')
     };
 
     const statusColor = getTaskStatusColor(taskType);

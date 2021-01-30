@@ -4,6 +4,7 @@ import ButtonTaskAdd from './ButtonTaskAdd';
 import TaskCard from './TaskCard';
 import { getTaskStatusColor, getTaskStatusTitle, genRandomTitle, genRandomBody } from '../utils/misc';
 import { TaskData, TaskType } from '../common/types';
+import move from 'array-move'
 
 interface TaskColumnProps {
   taskType: TaskType,
