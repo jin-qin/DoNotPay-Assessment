@@ -1,49 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+
 import './Home.css';
 
 import { TaskColumn } from '../components/TaskColumn';
-import { TaskData, TaskType } from '../common/types';
+import { TaskData, TaskType, Position } from '../common/types';
 
 export default function Home() {
     const [taskID, setTaskID] = useState<number>(0);  // global task ID, self-increased
-    const [tasks, setTasks] = useState<TaskData[]>([]);   // all tasks data
-    const [changeTasks, setChangeTasks] = useState(0); // counter to notify tasks items being changed
+    const [tasksPending, setTasksPending] = useState<TaskData[]>([]);
+    const [tasksInprogress, setTasksInprogress] = useState<TaskData[]>([]);
+    const [tasksCompleted, setTasksCompleted] = useState<TaskData[]>([]);
 
     return (
       <div className="Home">
-          <div className='Home-title'/>
+        <div className='Home-title'>
+          <div className='Home-title-trimmer'/>
+        </div>
 
-          <div className='Home-body'>
-              <TaskColumn 
-                taskType={ TaskType.Pending } 
-                tasks={tasks} 
-                setTasks={setTasks}
-                changeTasks={changeTasks}
-                setChangeTasks={setChangeTasks}
-                taskID={taskID}
-                setTaskID={setTaskID}
-              />
+        <div className='Home-body'>
+          <TaskColumn 
+            taskType={ TaskType.Pending } 
+            tasks={tasksPending} 
+            setTasks={setTasksPending}
+            taskID={taskID}
+            setTaskID={setTaskID}
+          />
 
-              <TaskColumn 
-                taskType={ TaskType.Inprogress } 
-                tasks={tasks} 
-                setTasks={setTasks}
-                changeTasks={changeTasks}
-                setChangeTasks={setChangeTasks}
-                taskID={taskID}
-                setTaskID={setTaskID}
-              />
+          <TaskColumn 
+            taskType={ TaskType.Inprogress } 
+            tasks={tasksInprogress} 
+            setTasks={setTasksInprogress}
+            taskID={taskID}
+            setTaskID={setTaskID}
+          />
 
-              <TaskColumn 
-                taskType={ TaskType.Completed } 
-                tasks={tasks} 
-                setTasks={setTasks}
-                changeTasks={changeTasks}
-                setChangeTasks={setChangeTasks}
-                taskID={taskID}
-                setTaskID={setTaskID}
-              />
-          </div>
+          <TaskColumn 
+            taskType={ TaskType.Completed } 
+            tasks={tasksCompleted} 
+            setTasks={setTasksCompleted}
+            taskID={taskID}
+            setTaskID={setTaskID}
+          />
+        </div>
       </div>
     );
 }

@@ -1,69 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { clamp, distance } from 'popmotion';
+import move from 'array-move';
+
 import './TaskColumn.css';
 import ButtonTaskAdd from './ButtonTaskAdd';
 import TaskCard from './TaskCard';
 import { getTaskStatusColor, getTaskStatusTitle, genRandomTitle, genRandomBody } from '../utils/misc';
-import { TaskData, TaskType } from '../common/types';
+import { TaskData, TaskType, Position } from '../common/types';
 
 interface TaskColumnProps {
   taskType: TaskType,
   tasks: TaskData[],
   setTasks: React.Dispatch<React.SetStateAction<TaskData[]>>,
-  changeTasks: number,
-  setChangeTasks: React.Dispatch<React.SetStateAction<number>>,
   taskID: number,
-  setTaskID: React.Dispatch<React.SetStateAction<number>>
+  setTaskID: React.Dispatch<React.SetStateAction<number>>,
 }
 
 export function TaskColumn(props: TaskColumnProps) {
-  const {taskType, tasks, setTasks, changeTasks, setChangeTasks, taskID, setTaskID} = props;
-  
-  const [tasksColumn, setTasksColumn] = useState<TaskData[]>([]);
-
-  const [prevDragOverY, setPrevDragOverY] = useState(0);
+  const {taskType, tasks, setTasks, taskID, setTaskID} = props;
 
   const title = getTaskStatusTitle(taskType);
   const statusColor = getTaskStatusColor(taskType);
 
-  useEffect(() => {
-    setTasksColumn(tasks.filter(task => task.taskType === taskType));
-  }, [tasks, changeTasks, taskType]);
-
-  const dragDropHandler = (ev: React.DragEvent<HTMLDivElement>) => {
-    ev.preventDefault();
-    
-    const id = ev.dataTransfer.getData('text/plain');
-    
-    const task_idx = tasks.findIndex(task => task.id === Number(id));
-    if (task_idx === -1) return;
-    
-    tasks[task_idx].taskType = taskType;
-
-    setChangeTasks(changeTasks + 1);
+  const positions = useRef<Position[]>([]).current;
+  const updatePosition = (idx: number, offset: Position) => {
+    positions[idx] = offset;
   };
 
-  const dragOverHandler = (ev: React.DragEvent<HTMLDivElement>) => {
-    ev.preventDefault();
-    ev.stopPropagation();
-    
-    const targetDOM = (ev.target as HTMLDivElement);
-    if (targetDOM.className !== 'TaskCard') return;
-    if (prevDragOverY === ev.clientY) return;
-
-    const taskID = Number(targetDOM.getAttribute("id"));
-    const targetRect = targetDOM.getClientRects()[0];
-    const targetHeight = targetRect.bottom - targetRect.top;
-    const diff = ev.clientY - targetRect.top;
-
-    const task_idx = tasks.findIndex(task => task.id === taskID);
-    if (diff < targetHeight / 2) {
-      
-    } else {
-
-    }
-
-    setPrevDragOverY(ev.clientY);
+  const updateOrder = (idx: number, dragOffset: number) => {
+    const targetIndex = calcTargetIndex(idx, dragOffset, positions);
+    if (targetIndex !== idx) setTasks(move(tasks, idx, targetIndex));
   };
+
+  const checkChangeItemType = (task: TaskData) => {
+    
+  }
 
   return (
     <div className="TaskColumn">
@@ -75,10 +46,7 @@ export function TaskColumn(props: TaskColumnProps) {
             </p>
         </div>
 
-        <div className="TaskColumn-body"
-             onDragOver = { dragOverHandler }
-             onDrop = { dragDropHandler }
-        >
+        <div className="TaskColumn-body">
           
           <ButtonTaskAdd onClick={() => {
             const newTask: TaskData = { id: taskID, taskType: taskType, title: genRandomTitle(), body: genRandomBody()};
@@ -88,14 +56,44 @@ export function TaskColumn(props: TaskColumnProps) {
           }}/>
 
           { 
-            tasksColumn.map(task => {
-              return <TaskCard 
-                key={task.id}
-                taskData={task}
-                />;
+            tasks.map((task, idx) => {
+              return (
+                <TaskCard 
+                  key={task.id}
+                  idx={idx}
+                  taskData={task}
+                  updatePosition={updatePosition}
+                  updateOrder={updateOrder}
+                />
+              )
             })
           }
         </div>
     </div>
   );
 }
+
+function calcTargetIndex(idx: number, yOffset: number, positions: Position[]) {
+  const buf = 10;
+  let target = idx;
+  const { top, height } = positions[idx];
+  const bottom = top + height;
+
+  if (yOffset > 0) {
+    const nextItem = positions[idx + 1];
+    if (nextItem === undefined) return idx;
+
+    const swapOffset = distance(bottom, nextItem.top + nextItem.height / 2) + buf;
+    if (yOffset > swapOffset) target = idx + 1;
+
+  } else if (yOffset < 0) {
+    const prevItem = positions[idx - 1];
+    if (prevItem === undefined) return idx;
+
+    const prevBottom = prevItem.top + prevItem.height;
+    const swapOffset = distance(top, prevBottom - prevItem.height / 2) + buf;
+    if (yOffset < -swapOffset) target = idx - 1;
+  }
+
+  return clamp(0, positions.length, target);
+};

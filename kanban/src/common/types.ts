@@ -11,3 +11,8 @@ export interface TaskData {
     title: string,
     body: string
 }
+
+export interface Position {
+    height: number,
+    top: number
+}

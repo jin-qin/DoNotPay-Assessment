@@ -15,7 +15,6 @@ export function genRandomText(n: number) {
     const len = test_text.lorem_ipsum.length;
     const startIdx = Math.floor(Math.random() * (len - n));
 
-    console.log(startIdx, startIdx + n)
     return test_text.lorem_ipsum.slice(startIdx, startIdx + n);
 }
 

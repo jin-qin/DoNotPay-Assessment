@@ -11,11 +11,20 @@
     border-radius: 2vmin;
 }
 
+
 .Home-title {
-    border-radius: 5px;
-    height: 5vmin;
+    border-radius: 3px;
+    height: 4vmin;
     background-color: rgb(44, 114, 219);
     width: 100%;
+}
+
+.Home-title-trimmer {
+    position: relative;
+    top: 3.5vmin;
+    width: 100%;
+    height: 0.5vmin;
+    background-color: white;
 }
 
 .Home-body {
